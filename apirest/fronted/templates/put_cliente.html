@@ -1,29 +1,26 @@
 <!DOCTYPE html>
 <html lang="es">
     <header>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Cliente</title>
+        <title>Actualizar Cliente</title>
+        <link rel="stylesheet" href="styles.css">
     </header>
     <body>
-        <h1>Actualizar cliente</h1>
-        
-        <form id="form_cliente" action="">
-            <label for="nombre">Nombre:</label>
-            <br>
-            <input type="text" id="nombre" name="nombre">
-            <br>
-            <label for="email">Email:</label>
-            <br>
-            <input type="email" id="email" name="email">
-            <br>
-            <br>
-            <input type="button" value="Actualizar" onclick="putCliente()">
-        </form>
-        <script type="text/javascript" src="static/js/put_cliente.js"></script>
-        <script type="text/javascript" src="../static/js/get_cliente.js"></script>
-        <script async>
-            document.body.onload = getCliente();
-        </script>
+        <section>
+            <div class="box">
+                <h1>Actualizar Cliente</h1><br><br>
+                <form id="form_cliente" action="">
+                    <label for="nombre">Nombre:</label><br><br>
+                    <input type="text" id="nombre" name="nombre"><br><br>
+                    <label for="email">Email:</label><br><br>
+                    <input type="email" id="email" name="email"><br><br>
+                    <input type="button" value="Actualizar" onclick="put_Cliente()">
+                </form>
+            </div>
+        </section>
+            <script type="text/javascript" src="put_cliente.js"></script>
+            <script type="text/javascript" src="get_cliente.js"></script>
+            <script async>
+                document.body.onload = get_Cliente();
+            </script>
     </body>
 </html>

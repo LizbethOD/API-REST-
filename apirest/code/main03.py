@@ -2,17 +2,40 @@ import hashlib  # Importa la libreria hashlib la cual permite generar un hash
 import sqlite3 #Importa Sqlite3
 import os # Permite trabajar con rutas y las ajusta de acuerdo al sistema operativo que se utilice 
 from typing import List #Los muestra en forma de lista
-
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials # De forma automatica solicita usuario y contraseña
 from pydantic import BaseModel #Valida el formato
 from fastapi.middleware.cors import CORSMiddleware
+from typing import List
+from pydantic import BaseModel
+from urllib.request import Request
+from urllib import response
+from lib2to3.pytree import Base
+from typing import Union
+from typing_extensions import Self
+import hashlib
+import sqlite3
+import os
+import pyrebase
 
 
 app = FastAPI() # Se encarga de validar que el formato sea igual a de respuesta
 
+firebaseConfig = {
+    'apiKey': "AIzaSyBmKYIgQYdvYQl8PMn7bRefAX7P2xkBCN0",
+    'authDomain': "api-firebase-e00d5.firebaseapp.com",
+    'databaseURL': "https://api-firebase-e00d5-default-rtdb.firebaseio.com",
+    'projectId': "api-firebase-e00d5",
+    'storageBucket': "api-firebase-e00d5.appspot.com",
+    'messagingSenderId': "326342988677",
+    'appId': "1:326342988677:web:bb66f9a6e6d5d637fb6aec"
+}
+
+firebase = pyrebase.initialize_app(firebaseConfig)
+
 DATABASE_URL = os.path.join("sql/usuarios.sqlite")
 security = HTTPBasic() # Solicita a la API usuario y contraseña
+securityBearer = HTTPBearer()
 
 class Respuesta(BaseModel):
     message:str
@@ -26,9 +49,17 @@ class Usuarios(BaseModel):
     username: str
     level: int
 
+class ClienteIN(BaseModel):
+    nombre: str
+    email: str
+
+class registro(BaseModel):
+    nombre: str
+    email: str
+
 origin = [
-    "https://8000-lizbethod-apirest-h5fixnrf1oq.ws-us54.gitpod.io/"
-    "https://8080-lizbethod-apirest-h5fixnrf1oq.ws-us54.gitpod.io/",
+    "https://8000-lizbethod-apirest-n3l0fmlt2en.ws-us60.gitpod.io/"
+    "https://8080-lizbethod-apirest-n3l0fmlt2en.ws-us60.gitpod.io/templates",
 ]
 
 app.add_middleware(
@@ -38,24 +69,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-def get_current_level(credentials: HTTPBasicCredentials = Depends(security)): # Se encarga de recibir los user y password,ademas indica si las contraseñas son correctas
-    password_b = hashlib.md5(credentials.password.encode()) # Lo convierte en MD5
-    password = password_b.hexdigest() # Lo convierte a BITS
-    with sqlite3.connect(DATABASE_URL) as connection:
-        cursor = connection.cursor()
-        cursor.execute(
-            "SELECT level FROM usuarios WHERE username = ? and password = ?",
-            (credentials.username, password),
-        )
-        user = cursor.fetchone()
-        if not user:
-            raise HTTPException( 
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect username or password",
-                headers={"WWW-Authenticate": "Basic"},
-            )
-    return user[0]
 
 @app.get("/", response_model=Respuesta) 
 async def index():
@@ -67,20 +80,21 @@ async def index():
     summary="Muestra una lista de clientes", # Se puede observar en la documentacion de la API
     description="Muestra una lista de clientes",
 )
-async def get_clientes(level: int = Depends(get_current_level)):
-    if level == 1:  # Administrador
-        with sqlite3.connect('sql/clientes.sqlite') as connection:
-            connection.row_factory=sqlite3.Row
-            cursor = connection.cursor() 
-            cursor.execute("SELECT * FROM clientes")
+async def get_clientes(credentials: HTTPAuthorizationCredentials = Depends(securityBearer)):
+    try:
+        auth = firebase.auth()
+        user = auth.get_account_info(credentials.credentials)
+        uid = user['users'][0]['localId'] 
+
+        with sqlite3.connect(DATABASE_URL) as connection:
+            connection.row_factory = sqlite3.Row
+            cursor = connection.cursor()
+            cursor.execute('SELECT * FROM clientes')
             response = cursor.fetchall()
             return response
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Don't have permission to access this resource",
-            headers={"WWW-Authenticate": "Basic"},
-        )
+    except Exception as error:
+        print(f"Error: {error}")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
 @app.get(
     "/clientes/{id}", response_model=List[Cliente],
@@ -88,26 +102,21 @@ async def get_clientes(level: int = Depends(get_current_level)):
     summary="Muestra un solo cliente",
     description="Muestra un solo cliente",
 )
-async def get_cliente(id: int,level: int = Depends(get_current_level)):
-    if level == 1:  # Administrador
-        with sqlite3.connect('sql/clientes.sqlite') as connection:
-            connection.row_factory=sqlite3.Row
-            cursor = connection.cursor()
-            cursor.execute("SELECT * FROM clientes where id_cliente={}".format(id))
-            response = cursor.fetchall()
+async def get_cliente(credentials: HTTPAuthorizationCredentials = Depends(securityBearer),id_cliente: int=0):
+    try:
+        auth = firebase.auth()
+        user = auth.get_account_info(credentials.credentials)
+        uid = user['users'][0]['localId'] 
+
+        with sqlite3.connect(DATABASE_URL) as connection:
+            connection.row_factory = sqlite3.Row
+            cursor=connection.cursor()
+            cursor.execute("SELECT * FROM clientes WHERE id_cliente={}".format(int(id_cliente)))
+            response=cursor.fetchall()
             return response
-            if response is None:
-                raise HTTPException(
-                    status_code = status.HTTP_404_NOT_FOUND,
-                    detail="ID No Encontrado",
-                    headers={"WWW-Authenticate": "Basic"},
-                )
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Don't have permission to access this resource",
-            headers={"WWW-Authenticate": "Basic"},
-        )
+    except Exception as error:
+        print(f"Error: {error}")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
 @app.post(  
     "/clientes/", response_model=Respuesta,

@@ -1,19 +1,38 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang= "es">
     <header>
-        <title>DOM javascript</title>
+        <title>Clientes</title>
+        <link rel="stylesheet" href="styles.css">
     </header>
     <body>
-        <h1>DOM javascript</h1>
-        <script type="text/javascript" src="/static/js/get_clientes.js"></script>
-        
-        <a href="/templetes/post_cliente.html">Agregar</a>
-        <table id="clientes_Table">
+        <section>
+            <div class="box">
+                <h1>Lista de Clientes</h1><br><br>
+                <div id="main_container">
+                    <table id = "tabla_clientes">
+                        <thead id = "thead_clientes">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Detalles</th>
+                                <th>Actualizar</th>
+                                <th>Eliminar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody">
 
-        </table>
-
-        <script async>
-            document.body.onload = getClientes();
-        </script>
+                        </tbody>
+                    </table>
+                </div><br><br>
+                <div id="button_container">
+                    <a href="post_cliente.html"><input type="button" class="button" value="Agregar cliente"></a>
+                </div>
+            </div>
+        </section>
+            <script src="get_clientes.js"></script> 
+            <script>
+                document.body.onload = get_Clientes();
+            </script>
     </body>
 </html>

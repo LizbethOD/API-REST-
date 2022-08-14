@@ -14,4 +14,6 @@ pip install fastapi
 pip install pytest
 
 
-uvicorn main03:app --reload
+uvicorn main04:app --reload
+
+python3 -m http.server 8080

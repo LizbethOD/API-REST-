@@ -1,12 +1,11 @@
-function postCliente(){
+function post_Cliente(){
 
-    var request = new XMLHttpRequest();
-
-    username = prompt('Username:')
-    password = prompt('Password:')
+    var token = sessionStorage.getItem('item');
+    console.log(token)
 
     let nombre = document.getElementById("nombre");
     let email = document.getElementById("email");
+
     let payload = {
         "nombre": nombre.value,
         "email" : email.value,
@@ -15,14 +14,15 @@ function postCliente(){
     console.log("nombre: " + nombre.value);
     console.log("email: "  + email.value);
     console.log(payload);
-    
-    request.open('POST', "https://8000-lizbethod-apirest-h5fixnrf1oq.ws-us54.gitpod.io/clientes/",true);
+
+    var request = new XMLHttpRequest();
+
+    request.open('POST', "https://8000-lizbethod-apirest-n3l0fmlt2en.ws-us60.gitpod.io/clientes/",true);
     request.setRequestHeader("Content-Type", "application/json");
     request.setRequestHeader("Accept", "application/json");
-    request.setRequestHeader("Authorization", "Basic " + btoa(username + ":" + password))
-
+    request.setRequestHeader("Authorization", "Bearer " + token)
+    
     request.onload = () => {
-        
         const response  = request.responseText;
         const json      = JSON.parse(response);     
         const status    = request.status;

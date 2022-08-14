@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html lang="es">
+<header>
+    <title>Agregar Cliente</title>
+    <link rel="stylesheet" href="styles.css">
+</header>
     <body>
-        <h1>Agregar cliente</h1>
-        <div class="container">
-            <form id="form_cliente" action="">
-                <label for="nombre">Nombre:</label>
-                <br>
-                <input type="text" id="nombre" name="nombre"/>
-                <br>
-                <label for="email">Email:</label>
-                <br>
-                <input type="email" id="email" name="email"/>
-                <br>
-                <br>
-                <input type="button" value="Agregar" onclick="postCliente()">
-            </form>
-        </div>
-        <script type="text/javascript" src="../static/js/post_cliente.js"></script>
+        <section>
+            <div class="box">
+                <h1>Agregar Cliente</h1><br><br>
+                <div class="container">
+                    <form id="form_cliente" action="">
+                        <label for="nombre">Nombre:</label><br><br>
+                        <input type="text" id="nombre" name="nombre"/><br><br>
+                        <label for="email">Email:</label><br><br>
+                        <input type="email" id="email" name="email"/><br><br>
+                        <input type="button" value="Agregar" onclick="postCliente()">
+                    </form>
+                </div>
+            </div>
+        </section>
+            <script type="text/javascript" src="post_cliente.js"></script>
     </body>
 </html>
